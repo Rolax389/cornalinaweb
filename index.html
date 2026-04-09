@@ -482,9 +482,15 @@
             
             <!-- Formulario -->
             <form id="form-reserva" class="p-8 space-y-5" onsubmit="submitReservation(event)">
-                <div>
-                    <label class="block text-xs font-bold text-brand-dark uppercase tracking-widest mb-2">Nombre Completo</label>
-                    <input type="text" id="res-nombre" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-gold focus:border-brand-gold outline-none transition-all bg-white/50 focus:bg-white" placeholder="Ej. Rolando...">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-brand-dark uppercase tracking-widest mb-2">Nombre Completo</label>
+                        <input type="text" id="res-nombre" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-gold outline-none transition-all bg-white/50 focus:bg-white" placeholder="Ej. Rolando...">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-brand-dark uppercase tracking-widest mb-2">WhatsApp</label>
+                        <input type="tel" id="res-telefono" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-gold outline-none transition-all bg-white/50 focus:bg-white" placeholder="10 dígitos">
+                    </div>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
@@ -572,11 +578,16 @@
             
             <!-- Vista: Gestor de Reservas -->
             <div id="panel-reservas" class="block animate-fade-in">
-                <div class="flex justify-between items-center mb-8">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                     <h1 class="text-3xl font-bold text-gray-800 font-serif">Gestión de Reservas</h1>
-                    <span class="bg-brand-light text-brand-dark px-4 py-2 rounded-full text-sm font-bold tracking-wider uppercase border border-brand-gold/30 flex items-center gap-2 shadow-sm">
-                        <i class="far fa-calendar-alt text-brand-gold"></i> <span id="admin-date"></span>
-                    </span>
+                    <div class="flex items-center gap-3">
+                        <button onclick="window.exportarCSV()" class="bg-[#107c41] hover:bg-[#185c37] text-white px-4 py-2 rounded-full text-sm font-bold tracking-wider uppercase shadow-md transition-colors flex items-center gap-2 active:scale-95">
+                            <i class="fas fa-file-csv text-lg"></i> Exportar
+                        </button>
+                        <span class="bg-brand-light text-brand-dark px-4 py-2 rounded-full text-sm font-bold tracking-wider uppercase border border-brand-gold/30 hidden md:flex items-center gap-2 shadow-sm">
+                            <i class="far fa-calendar-alt text-brand-gold"></i> <span id="admin-date"></span>
+                        </span>
+                    </div>
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
@@ -879,6 +890,7 @@
             
             const nuevaReserva = {
                 nombre: document.getElementById('res-nombre').value,
+                telefono: document.getElementById('res-telefono').value,
                 fecha: document.getElementById('res-fecha').value,
                 hora: document.getElementById('res-hora').value,
                 pax: document.getElementById('res-personas').value,
@@ -1137,13 +1149,13 @@
                 
                 tbody.innerHTML += `
                     <tr class="hover:bg-gray-50 transition-colors border-b border-gray-100 group">
-                        <td class="p-5 font-bold text-brand-dark">${res.nombre}</td>
+                        <td class="p-5 font-bold text-brand-dark">${res.nombre}<br><span class="text-xs font-normal text-gray-500"><i class="fab fa-whatsapp text-green-500"></i> ${res.telefono || 'N/A'}</span></td>
                         <td class="p-5 text-gray-600">${res.fecha} <br><span class="text-xs font-bold text-brand-gold">${res.hora}</span></td>
                         <td class="p-5 text-center"><span class="bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-bold text-xs"><i class="fas fa-user mr-1"></i> ${res.pax}</span></td>
                         <td class="p-5 text-xs text-gray-500 italic max-w-[200px] truncate" title="${res.notas}">"${res.notas}"</td>
                         <td class="p-5">${statusBadge}</td>
                         <td class="p-5 text-center space-x-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                            ${res.estado === 'Pendiente' ? `<button onclick="window.cambiarEstado('${res.id}', 'Confirmada')" class="text-green-500 hover:text-white hover:bg-green-500 border border-green-500 w-8 h-8 rounded-full transition-all" title="Confirmar"><i class="fas fa-check"></i></button>` : ''}
+                            ${res.estado === 'Pendiente' ? `<button onclick="window.cambiarEstado('${res.id}', 'Confirmada')" class="text-green-500 hover:text-white hover:bg-green-500 border border-green-500 w-8 h-8 rounded-full transition-all" title="Confirmar y Notificar"><i class="fas fa-check"></i></button>` : ''}
                             ${res.estado === 'Pendiente' ? `<button onclick="window.cambiarEstado('${res.id}', 'Rechazada')" class="text-orange-400 hover:text-white hover:bg-orange-400 border border-orange-400 w-8 h-8 rounded-full transition-all" title="Rechazar"><i class="fas fa-times"></i></button>` : ''}
                             <button onclick="window.eliminarReserva('${res.id}')" class="text-red-400 hover:text-white hover:bg-red-500 border border-red-400 w-8 h-8 rounded-full transition-all" title="Eliminar Permanente"><i class="fas fa-trash-alt"></i></button>
                         </td>
@@ -1156,6 +1168,19 @@
             try {
                 const reservaRef = doc(db, "reservaciones", id);
                 await updateDoc(reservaRef, { estado: nuevoEstado });
+
+                // Lógica de mensaje automático de WhatsApp al Confirmar
+                if (nuevoEstado === 'Confirmada') {
+                    const reserva = reservaciones.find(r => r.id === id);
+                    if (reserva && reserva.telefono) {
+                        // Limpiar caracteres extraños del número
+                        const num = reserva.telefono.replace(/\D/g, ''); 
+                        const mensaje = `¡Hola ${reserva.nombre}! Tu mesa en Cornalina ha sido confirmada para el ${reserva.fecha} a las ${reserva.hora}. ¡Te esperamos con mucho gusto! 🫖✨`;
+                        // Se abre una nueva pestaña a la API nativa web de WhatsApp
+                        const url = `https://wa.me/52${num}?text=${encodeURIComponent(mensaje)}`;
+                        window.open(url, '_blank');
+                    }
+                }
             } catch (error) {
                 console.error("Error al actualizar:", error);
                 alert("Error de permisos en Firebase Firestore.");
@@ -1187,6 +1212,42 @@
             const msg = document.getElementById('save-msg');
             msg.style.opacity = '1';
             setTimeout(() => msg.style.opacity = '0', 3000);
+        };
+
+        // --- EXPORTACIÓN DE RESERVAS (CSV) ---
+        window.exportarCSV = function() {
+            if (reservaciones.length === 0) {
+                alert("No hay reservaciones para exportar.");
+                return;
+            }
+
+            // Preparar Cabeceras
+            let csvContent = "\uFEFF"; // BOM para compatibilidad de acentos en Excel
+            csvContent += "Fecha,Hora,Nombre,WhatsApp,Personas,Estado,Notas\n";
+
+            // Llenar Datos
+            reservaciones.forEach(res => {
+                // Quitar saltos de línea y comas en las notas para no romper el CSV
+                const notasSeguras = res.notas.replace(/(\r\n|\n|\r|,)/gm, " ");
+                const nombreSeguro = res.nombre.replace(/,/g, "");
+                
+                const fila = `"${res.fecha}","${res.hora}","${nombreSeguro}","${res.telefono || ''}","${res.pax}","${res.estado}","${notasSeguras}"`;
+                csvContent += fila + "\n";
+            });
+
+            // Generar y descargar el archivo
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            const hoy = new Date().toISOString().split('T')[0];
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Reservas_Cornalina_${hoy}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         };
     </script>
 </body>
