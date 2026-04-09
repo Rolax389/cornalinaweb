@@ -250,11 +250,11 @@
                     <div class="h-1 w-24 bg-brand-gold mx-auto rounded-full"></div>
                 </div>
 
-                <!-- Controles de Pestañas (Tabs) -->
-                <div class="flex justify-center gap-2 md:gap-4 mb-12 overflow-x-auto no-scrollbar pb-4 reveal delay-100 px-2">
-                    <button id="btn-tea" onclick="switchTab('tea')" class="tab-btn whitespace-nowrap bg-brand-gold text-brand-dark px-6 py-3 rounded-full text-sm font-bold transition-all uppercase tracking-wider shadow-lg active:scale-95">Afternoon Tea</button>
-                    <button id="btn-brunch" onclick="switchTab('brunch')" class="tab-btn whitespace-nowrap bg-transparent text-white border border-brand-gold hover:bg-brand-gold/20 px-6 py-3 rounded-full text-sm font-bold transition-all uppercase tracking-wider active:scale-95">Brunch Mexicano</button>
-                    <button id="btn-bebidas" onclick="switchTab('bebidas')" class="tab-btn whitespace-nowrap bg-transparent text-white border border-brand-gold hover:bg-brand-gold/20 px-6 py-3 rounded-full text-sm font-bold transition-all uppercase tracking-wider active:scale-95">Tragos Coquetos</button>
+                <!-- Controles de Pestañas (Tabs) CORREGIDOS PARA MÓVIL -->
+                <div class="flex md:justify-center gap-3 overflow-x-auto no-scrollbar pb-6 reveal delay-100 px-2 snap-x snap-mandatory">
+                    <button id="btn-tea" onclick="switchTab('tea')" class="tab-btn shrink-0 snap-center whitespace-nowrap bg-brand-gold text-brand-dark px-6 py-3 rounded-full text-sm font-bold transition-all uppercase tracking-wider shadow-lg active:scale-95">Afternoon Tea</button>
+                    <button id="btn-brunch" onclick="switchTab('brunch')" class="tab-btn shrink-0 snap-center whitespace-nowrap bg-transparent text-white border border-brand-gold hover:bg-brand-gold/20 px-6 py-3 rounded-full text-sm font-bold transition-all uppercase tracking-wider active:scale-95">Brunch Mexicano</button>
+                    <button id="btn-bebidas" onclick="switchTab('bebidas')" class="tab-btn shrink-0 snap-center whitespace-nowrap bg-transparent text-white border border-brand-gold hover:bg-brand-gold/20 px-6 py-3 rounded-full text-sm font-bold transition-all uppercase tracking-wider active:scale-95">Tragos Coquetos</button>
                 </div>
 
                 <!-- Panel: Afternoon Tea -->
@@ -548,7 +548,10 @@
             </div>
             <nav class="flex-1 p-4 space-y-2">
                 <button onclick="switchAdminTab('reservas')" id="tab-reservas" class="w-full text-left px-4 py-3 rounded-lg bg-brand-gold text-brand-dark font-semibold transition-colors flex items-center gap-3">
-                    <i class="fas fa-calendar-check w-5"></i> Reservaciones
+                    <i class="fas fa-list w-5"></i> Lista de Reservas
+                </button>
+                <button onclick="switchAdminTab('calendario')" id="tab-calendario" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white transition-colors flex items-center gap-3">
+                    <i class="far fa-calendar-alt w-5"></i> Calendario
                 </button>
                 <button onclick="switchAdminTab('estadisticas')" id="tab-estadisticas" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white transition-colors flex items-center gap-3">
                     <i class="fas fa-chart-bar w-5"></i> Estadísticas
@@ -593,6 +596,49 @@
                                 <!-- Las filas se inyectan con JS -->
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista: Calendario -->
+            <div id="panel-calendario" class="hidden animate-fade-in h-full flex flex-col">
+                <div class="mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800 font-serif">Calendario de Reservas</h1>
+                    <p class="text-gray-500 mt-1">Visualiza la ocupación de mesas por mes y día.</p>
+                </div>
+
+                <div class="flex-1 flex flex-col lg:flex-row gap-6">
+                    <!-- Cuadrícula del Calendario -->
+                    <div class="lg:w-2/3 bg-white rounded-2xl shadow-xl p-6 border border-gray-100 flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <button onclick="cambiarMes(-1)" class="p-2 hover:bg-gray-100 rounded-full transition-colors"><i class="fas fa-chevron-left"></i></button>
+                            <h2 id="mes-actual" class="text-xl font-bold text-brand-dark uppercase tracking-widest"></h2>
+                            <button onclick="cambiarMes(1)" class="p-2 hover:bg-gray-100 rounded-full transition-colors"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                            <div class="text-xs font-bold text-gray-400 uppercase">Dom</div>
+                            <div class="text-xs font-bold text-gray-400 uppercase">Lun</div>
+                            <div class="text-xs font-bold text-gray-400 uppercase">Mar</div>
+                            <div class="text-xs font-bold text-gray-400 uppercase">Mié</div>
+                            <div class="text-xs font-bold text-gray-400 uppercase">Jue</div>
+                            <div class="text-xs font-bold text-gray-400 uppercase">Vie</div>
+                            <div class="text-xs font-bold text-gray-400 uppercase">Sáb</div>
+                        </div>
+                        <div id="dias-calendario" class="grid grid-cols-7 gap-2 flex-1 auto-rows-fr">
+                            <!-- JS inyecta días -->
+                        </div>
+                    </div>
+
+                    <!-- Detalle del Día Seleccionado -->
+                    <div class="lg:w-1/3 bg-brand-light rounded-2xl shadow-lg p-6 border border-brand-gold/20 flex flex-col h-full overflow-hidden">
+                        <h3 class="font-serif text-xl font-bold text-brand-dark border-b border-brand-gold/30 pb-4 mb-4 flex items-center gap-2">
+                            <i class="far fa-calendar-check text-brand-gold"></i> Detalle del Día
+                        </h3>
+                        <p id="fecha-seleccionada" class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Selecciona una fecha</p>
+                        
+                        <div id="detalle-reservas-dia" class="flex-1 overflow-y-auto no-scrollbar space-y-3">
+                            <div class="text-center text-gray-400 italic mt-10">Haz clic en un día del calendario para ver las reservaciones.</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -681,6 +727,10 @@
         let currentUser = null;
         let chartInstance = null;
 
+        // Variables Calendario
+        let fechaActualCalendario = new Date();
+        let diaSeleccionado = null;
+
         // Logger de analíticas
         window.logEvent = async function(eventName) {
             const data = {
@@ -715,8 +765,12 @@
                     reservaciones = [];
                     snapshot.forEach((doc) => reservaciones.push({ id: doc.id, ...doc.data() }));
                     reservaciones.sort((a, b) => b.createdAt - a.createdAt);
+                    
                     if (!document.getElementById('admin-view').classList.contains('hidden')) {
                         window.renderTablaReservas();
+                        if (!document.getElementById('panel-calendario').classList.contains('hidden')) {
+                            window.renderCalendario();
+                        }
                     }
                 }, (error) => console.error("Error Firebase:", error));
 
@@ -869,34 +923,155 @@
 
         window.switchAdminTab = function(tab) {
             const btnRes = document.getElementById('tab-reservas');
+            const btnCal = document.getElementById('tab-calendario');
             const btnEst = document.getElementById('tab-estadisticas');
             const btnCont = document.getElementById('tab-contenido');
             
             const panRes = document.getElementById('panel-reservas');
+            const panCal = document.getElementById('panel-calendario');
             const panEst = document.getElementById('panel-estadisticas');
             const panCont = document.getElementById('panel-contenido');
 
             // Resetear botones y paneles
-            [btnRes, btnEst, btnCont].forEach(btn => {
+            [btnRes, btnCal, btnEst, btnCont].forEach(btn => {
                 btn.className = "w-full text-left px-4 py-3 rounded-lg hover:bg-gray-800 text-gray-300 hover:text-white transition-colors flex items-center gap-3";
             });
-            [panRes, panEst, panCont].forEach(pan => {
+            [panRes, panCal, panEst, panCont].forEach(pan => {
                 pan.classList.add('hidden');
-                pan.classList.remove('block');
+                pan.classList.remove('block', 'flex');
             });
 
             // Activar selección
             if (tab === 'reservas') {
                 btnRes.className = "w-full text-left px-4 py-3 rounded-lg bg-brand-gold text-brand-dark font-semibold transition-colors flex items-center gap-3";
                 panRes.classList.remove('hidden'); panRes.classList.add('block');
+            } else if (tab === 'calendario') {
+                btnCal.className = "w-full text-left px-4 py-3 rounded-lg bg-brand-gold text-brand-dark font-semibold transition-colors flex items-center gap-3";
+                panCal.classList.remove('hidden'); panCal.classList.add('flex'); // Es flex
+                window.renderCalendario();
             } else if (tab === 'estadisticas') {
                 btnEst.className = "w-full text-left px-4 py-3 rounded-lg bg-brand-gold text-brand-dark font-semibold transition-colors flex items-center gap-3";
                 panEst.classList.remove('hidden'); panEst.classList.add('block');
-                window.renderChart(); // Renderizar gráfico al abrir pestaña
+                window.renderChart();
             } else {
                 btnCont.className = "w-full text-left px-4 py-3 rounded-lg bg-brand-gold text-brand-dark font-semibold transition-colors flex items-center gap-3";
                 panCont.classList.remove('hidden'); panCont.classList.add('block');
             }
+        };
+
+        // --- RENDER DE CALENDARIO ---
+        window.cambiarMes = function(delta) {
+            fechaActualCalendario.setMonth(fechaActualCalendario.getMonth() + delta);
+            window.renderCalendario();
+        };
+
+        window.renderCalendario = function() {
+            const container = document.getElementById('dias-calendario');
+            if(!container) return;
+            container.innerHTML = '';
+
+            const mesActual = fechaActualCalendario.getMonth();
+            const anioActual = fechaActualCalendario.getFullYear();
+            
+            const opciones = { month: 'long', year: 'numeric' };
+            document.getElementById('mes-actual').innerText = fechaActualCalendario.toLocaleDateString('es-MX', opciones);
+
+            const primerDiaMes = new Date(anioActual, mesActual, 1).getDay();
+            const diasEnMes = new Date(anioActual, mesActual + 1, 0).getDate();
+
+            // Espacios en blanco inicio del mes
+            for (let i = 0; i < primerDiaMes; i++) {
+                container.innerHTML += `<div class="p-2"></div>`;
+            }
+
+            // Agrupar reservaciones por fecha
+            const reservasPorFecha = {};
+            reservaciones.forEach(res => {
+                if(!reservasPorFecha[res.fecha]) reservasPorFecha[res.fecha] = [];
+                reservasPorFecha[res.fecha].push(res);
+            });
+
+            const hoy = new Date();
+
+            for (let dia = 1; dia <= diasEnMes; dia++) {
+                const fechaIteracion = new Date(anioActual, mesActual, dia);
+                // Formato YYYY-MM-DD local
+                const mesStr = String(mesActual + 1).padStart(2, '0');
+                const diaStr = String(dia).padStart(2, '0');
+                const fechaStr = `${anioActual}-${mesStr}-${diaStr}`;
+                
+                const tieneReserva = reservasPorFecha[fechaStr] && reservasPorFecha[fechaStr].length > 0;
+                const cantReservas = tieneReserva ? reservasPorFecha[fechaStr].length : 0;
+                
+                const esHoy = dia === hoy.getDate() && mesActual === hoy.getMonth() && anioActual === hoy.getFullYear();
+                const esSeleccionado = diaSeleccionado === fechaStr;
+
+                let btnClasses = `w-full h-full min-h-[40px] md:min-h-[60px] rounded-lg border transition-all flex flex-col items-center justify-center relative cursor-pointer active:scale-95 `;
+                
+                if (esSeleccionado) {
+                    btnClasses += `bg-brand-dark text-white border-brand-dark shadow-md`;
+                } else if (esHoy) {
+                    btnClasses += `bg-brand-gold/10 text-brand-dark font-bold border-brand-gold`;
+                } else {
+                    btnClasses += `bg-white hover:bg-gray-50 text-gray-700 border-gray-100 hover:border-gray-300`;
+                }
+
+                let indicador = tieneReserva ? `<div class="absolute bottom-1 w-2 h-2 rounded-full bg-brand-gold shadow-[0_0_5px_#D4AF37]"></div>` : '';
+                if(tieneReserva && cantReservas > 1) {
+                    indicador = `<div class="absolute bottom-1 bg-brand-gold text-[8px] font-bold text-brand-dark px-1.5 rounded-full shadow-[0_0_5px_#D4AF37]">${cantReservas}</div>`;
+                }
+
+                container.innerHTML += `
+                    <button onclick="seleccionarDiaCalendario('${fechaStr}')" class="${btnClasses}">
+                        <span class="text-sm md:text-lg ${esSeleccionado ? 'font-bold' : ''}">${dia}</span>
+                        ${indicador}
+                    </button>
+                `;
+            }
+        };
+
+        window.seleccionarDiaCalendario = function(fechaStr) {
+            diaSeleccionado = fechaStr;
+            window.renderCalendario(); // Re-render para marcar seleccionado
+
+            // Formatear fecha para el título
+            const partes = fechaStr.split('-');
+            const fechaBonita = new Date(partes[0], partes[1] - 1, partes[2]).toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('fecha-seleccionada').innerText = fechaBonita;
+
+            const contenedor = document.getElementById('detalle-reservas-dia');
+            contenedor.innerHTML = '';
+
+            const reservasDelDia = reservaciones.filter(r => r.fecha === fechaStr);
+            
+            // Ordenar por hora
+            reservasDelDia.sort((a, b) => a.hora.localeCompare(b.hora));
+
+            if(reservasDelDia.length === 0) {
+                contenedor.innerHTML = `<div class="text-center text-gray-400 italic mt-10"><i class="fas fa-bed text-2xl mb-2 opacity-50 block"></i> No hay reservaciones programadas.</div>`;
+                return;
+            }
+
+            reservasDelDia.forEach(res => {
+                let statusColor = res.estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : 
+                                 (res.estado === 'Confirmada' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-100 text-red-700 border-red-200');
+
+                contenedor.innerHTML += `
+                    <div class="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-2">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="font-bold text-brand-dark text-lg">${res.hora}</span>
+                                <p class="font-semibold text-gray-800 text-sm">${res.nombre}</p>
+                            </div>
+                            <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-md border ${statusColor}">${res.estado}</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-xs text-gray-500 mt-1">
+                            <span class="bg-gray-100 px-2 py-1 rounded"><i class="fas fa-user mr-1"></i> ${res.pax} pax</span>
+                            ${res.notas !== 'N/A' && res.notas !== '' ? `<span class="italic max-w-[150px] truncate" title="${res.notas}"><i class="far fa-comment-dots mr-1"></i> ${res.notas}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
         };
 
         // --- RENDER DE GRÁFICOS ---
